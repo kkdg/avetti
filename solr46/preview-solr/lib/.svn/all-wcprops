@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/software/!svn/ver/120595/avetticommerce/commerce8.5/trunk/src/site/resources/solr/lib
+END
+solr_extension.jar
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/software/!svn/ver/120413/avetticommerce/commerce8.5/trunk/src/site/resources/solr/lib/solr_extension.jar
+END
+custom-avetti-components-solr-extension-4.6.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/software/!svn/ver/120595/avetticommerce/commerce8.5/trunk/src/site/resources/solr/lib/custom-avetti-components-solr-extension-4.6.0.jar
+END

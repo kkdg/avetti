@@ -1,0 +1,85 @@
+#! /bin/sh
+
+SED="/bin/sed"
+prefix="/avetti/httpd/php"
+exec_prefix="${prefix}"
+version="5.3.6"
+vernum="50306"
+include_dir="${prefix}/include/php"
+includes="-I$include_dir -I$include_dir/main -I$include_dir/TSRM -I$include_dir/Zend -I$include_dir/ext -I$include_dir/ext/date/lib"
+ldflags=" -L/usr/kerberos/lib64 -L/avetti/mysql/lib -L/usr/lib64/mysql -L/usr/lib64"
+libs="-lcrypt   -lz -lcrypt -lreadline -lncurses -lrt -lmysqlclient -lmcrypt -lltdl -lcurl -lbz2 -lz -lrt -lm -ldl -lnsl  -lxml2 -lz -lm -lssl -lcrypto -ldl -lz -lcurl -ldl -lgssapi_krb5 -lkrb5 -lk5crypto -lcom_err -lidn -lssl -lcrypto -lz -lxml2 -lz -lm -lssl -lcrypto -ldl -lz -lmysqlclient -lz -lcrypt -lnsl -lm -lssl -lcrypto -lmysqlclient -lz -lm -lrt -ldl -lxml2 -lz -lm -lcrypt -lxml2 -lz -lm -lxml2 -lz -lm -lxml2 -lz -lm -lxml2 -lz -lm -lcrypt "
+extension_dir='/avetti/httpd/php/lib/php/extensions/no-debug-non-zts-20090626'
+program_prefix=""
+program_suffix=""
+exe_extension=""
+php_cli_binary=NONE
+php_cgi_binary=NONE
+configure_options=" '--prefix=/avetti/httpd/php' '--with-apxs2=/avetti/httpd/bin/apxs' '--with-mysql=/avetti/mysql' '--enable-mbstring' '--with-config-file-path=/avetti/httpd/php' '--with-config-file-scan-dir=/avetti/httpd/php/php.d' '--enable-bcmath=shared' '--with-bz2' '--enable-calendar' '--with-curl' '--enable-dba=shared' '--enable-exif' '--enable-ftp' '--with-gettext' '--with-mhash' '--with-mysqli' '--with-openssl-dir=/usr' '--with-openssl' '--enable-pcntl' '--with-readline' '--enable-shmop' '--enable-soap=shared' '--enable-sockets' '--enable-sysvmsg' '--enable-sysvsem' '--enable-sysvshm' '--enable-wddx' '--enable-zip' '--with-zlib' '--with-mcrypt' '--with-pdo_mysql=/avetti/mysql' '--with-pdo_sqlite' '--with-libxml-dir=/avetti/httpd/php'"
+php_sapis="cli apache2handler"
+
+# Set php_cli_binary and php_cgi_binary if available
+for sapi in $php_sapis; do
+  case $sapi in
+  cli)
+    php_cli_binary="${exec_prefix}/bin/${program_prefix}php${program_suffix}${exe_extension}"
+    ;;
+  cgi)
+    php_cgi_binary="${exec_prefix}/bin/${program_prefix}php-cgi${program_suffix}${exe_extension}"
+    ;;
+  esac
+done
+
+# Determine which (if any) php binary is available
+if test "$php_cli_binary" != "NONE"; then
+  php_binary="$php_cli_binary"
+else
+  php_binary="$php_cgi_binary"
+fi
+
+# Remove quotes
+configure_options=`echo $configure_options | $SED -e "s#'##g"`
+
+case "$1" in
+--prefix)
+  echo $prefix;;
+--includes)
+  echo $includes;;
+--ldflags)
+  echo $ldflags;;
+--libs)
+  echo $libs;;
+--extension-dir)
+  echo $extension_dir;;
+--include-dir)
+  echo $include_dir;;
+--php-binary)
+  echo $php_binary;;
+--php-sapis)
+  echo $php_sapis;;
+--configure-options)
+  echo $configure_options;;
+--version)
+  echo $version;;
+--vernum)
+  echo $vernum;;
+*)
+  cat << EOF
+Usage: $0 [OPTION]
+Options:
+  --prefix            [$prefix]
+  --includes          [$includes]
+  --ldflags           [$ldflags]
+  --libs              [$libs]
+  --extension-dir     [$extension_dir]
+  --include-dir       [$include_dir]
+  --php-binary        [$php_binary]
+  --php-sapis         [$php_sapis]
+  --configure-options [$configure_options]
+  --version           [$version]
+  --vernum            [$vernum]
+EOF
+  exit 1;;
+esac
+
+exit 0

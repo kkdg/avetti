@@ -1,0 +1,77 @@
+#
+# Startup script for the Tomcat Application Server
+#
+# chkconfig: - 86 16
+# description: Apache Tomcat is a World Wide Web Application server.
+# processname: tomcat
+# pidfile: /var/run/jsvc.pid
+#
+#
+#!/bin/sh
+if [ "$(id -u)" != "0" ]; then
+   echo "This must be run using 'sudo'." 1>&2
+   exit 1
+fi
+
+JAVA_HOME=avetti_java_home
+CATALINA_HOME=/avetti/tomcat
+DAEMON_HOME=avetti_daemon_home
+TOMCAT_USER=tomcat
+TMP_DIR=/var/tmp
+CATALINA_OPTS="-Xms2048M -Xmx2048M -XX:PermSize=256M -XX:MaxPermSize=512M -Duser.timezone=Canada/Eastern"
+CLASSPATH=\
+$JAVA_HOME/lib/tools.jar:\
+$DAEMON_HOME/dist/commons-daemon.jar:\
+$CATALINA_HOME/bin/bootstrap.jar:\
+$CATALINA_HOME/bin/tomcat-juli.jar
+PID_FILE=/var/run/jsvc.pid
+
+case "$1" in
+  start)
+    #
+    # Start Tomcat
+    #
+#echo -e "\n\nCOMMERCE PCI SECURE FORM - COPYRIGHT Avetti.com Corporation 1998-2012. All Rights Reserved\n\nPlease provide a BASE64 one line encoded RSA private key (see base64 -w 0).\nIf you dont have one press enter:\n\n"
+#  read PRIVKEY
+#  export PRIVKEY
+    umask 002
+
+    $DAEMON_HOME/unix/jsvc \
+    -user $TOMCAT_USER \
+    -home $JAVA_HOME \
+    -Dcatalina.home=$CATALINA_HOME \
+    -Djava.io.tmpdir=$TMP_DIR \
+    -outfile $CATALINA_HOME/logs/catalina.out \
+    -errfile '&1' \
+    -procname jsvc \
+    $CATALINA_OPTS \
+    -pidfile $PID_FILE \
+    -server \
+    -cp $CLASSPATH \
+    org.apache.catalina.startup.Bootstrap
+    #
+    # To get a verbose JVM
+    #-verbose \
+    # To get a debug of jsvc.
+    #-debug \
+    ;;
+
+  stop)
+    #
+    # Stop Tomcat
+    #
+    PID=`cat $PID_FILE`
+    kill $PID
+    echo -n "Shutting down tomcat"
+    while [ -e "$PID_FILE" ];
+    do
+        echo -n "."
+        sleep 1
+    done
+    echo " done."
+    ;;
+
+  *)
+    echo "Usage tomcat.sh start/stop"
+    exit 1;;
+esac

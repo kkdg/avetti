@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<config>
+	
+  <luceneMatchVersion>LUCENE_40</luceneMatchVersion>	
+	
+  <!-- Set this to 'false' if you want solr to continue working after it has 
+       encountered an severe configuration error.  In a production environment, 
+       you may want solr to keep working even if one handler is mis-configured.
+
+       You may also set this to false using by setting the system property:
+         -Dsolr.abortOnConfigurationError=false
+     -->
+  <abortOnConfigurationError>${solr.abortOnConfigurationError:true}</abortOnConfigurationError>
+
+  <updateHandler class="solr.DirectUpdateHandler2">
+    <!-- Enables a transaction log, currently used for real-time get.
+         "dir" - the target directory for transaction logs, defaults to the
+         solr data directory.  -->
+    <updateLog>
+      <str name="dir">${solr.data.dir:}</str>
+    </updateLog> 
+  </updateHandler>     
+
+  <requestDispatcher handleSelect="true" >
+    <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048" />
+  </requestDispatcher>
+  
+  <requestHandler name="standard" class="solr.StandardRequestHandler" default="true" />
+  <requestHandler name="/update" class="solr.XmlUpdateRequestHandler" />
+  <requestHandler name="/admin/" class="org.apache.solr.handler.admin.AdminHandlers" />
+  <!-- ping/healthcheck -->
+  <requestHandler name="/admin/ping" class="solr.PingRequestHandler">
+    <lst name="invariants">
+      <str name="q">solrpingquery</str>
+    </lst>
+    <lst name="defaults">
+      <str name="echoParams">all</str>
+    </lst>
+    <!-- An optional feature of the PingRequestHandler is to configure the 
+         handler with a "healthcheckFile" which can be used to enable/disable 
+         the PingRequestHandler.
+         relative paths are resolved against the data dir 
+      -->
+    <!-- <str name="healthcheckFile">server-enabled.txt</str> -->
+  </requestHandler>  
+  
+  
+  <requestHandler name="dismax" class="solr.SearchHandler" >
+    <lst name="defaults">
+     <str name="defType">dismax</str>
+     <str name="echoParams">explicit</str>
+     <float name="tie">0.01</float>
+     <str name="qf">
+        name^1
+     </str>
+     <str name="pf">
+        name^1
+     </str>
+     <str name="bf">
+     </str>
+     <str name="fl">
+        *
+     </str>
+     <str name="mm">
+        1
+     </str>
+     <int name="ps">100</int>
+     <str name="q.alt">*:*</str>
+     <!-- example highlighter config, enable per-query with hl=true -->     
+     <str name="hl.fl">text features name</str>
+     <!-- for this field, we want no fragmenting, just highlighting -->
+     <str name="f.name.hl.fragsize">0</str>
+     <!-- instructs Solr to return the field itself if no query terms are
+          found -->
+     <str name="f.name.hl.alternateField">name</str>
+     <str name="f.text.hl.fragmenter">regex</str> <!-- defined below -->
+    </lst>
+  </requestHandler>
+  <requestHandler name="/replication" class="solr.ReplicationHandler" startup="lazy" />
+    
+    <requestHandler name="/get" class="solr.RealTimeGetHandler">
+      <lst name="defaults">
+        <str name="omitHeader">true</str>
+     </lst>
+    </requestHandler>  
+
+          
+  <!-- config for the admin interface --> 
+  <admin>
+    <defaultQuery>solr</defaultQuery>
+  </admin>
+
+</config>

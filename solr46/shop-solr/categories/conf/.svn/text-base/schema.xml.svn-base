@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!--  
+ This is the Solr schema file. This file should be named "schema.xml" and
+ should be in the conf directory under the solr home
+ (i.e. ./solr/conf/schema.xml by default) 
+ or located where the classloader for the Solr webapp can find it.
+
+ This example schema is the recommended starting point for users.
+ It should be kept correct and concise, usable out-of-the-box.
+
+ For more information, on how to customize this file, please see
+ http://wiki.apache.org/solr/SchemaXml
+-->
+
+<schema name="category" version="1.0">
+	<types>
+		
+		
+	    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+	    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
+	    <fieldType name="integer" class="solr.IntField" omitNorms="true"/>
+	    <fieldType name="long" class="solr.LongField" omitNorms="true"/>
+	    <fieldType name="date" class="solr.DateField" sortMissingLast="true" omitNorms="true"/>
+	    
+	    <!--
+	    <fieldType name="text_ws" class="solr.TextField" positionIncrementGap="100">
+      		<analyzer>
+        		<tokenizer class="solr.WhitespaceTokenizerFactory"/>
+      		</analyzer>
+    	</fieldType>
+    	-->
+    	
+    	<fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+			<analyzer type="index">
+		        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+		        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0"/>
+		        <filter class="solr.LowerCaseFilterFactory"/>
+		        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+	      	</analyzer>
+		    <analyzer type="query">
+		    	<tokenizer class="solr.WhitespaceTokenizerFactory"/>
+		        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0"/>
+		        <filter class="solr.LowerCaseFilterFactory"/>
+		        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+		      </analyzer>
+	    	</fieldType>
+    	<!-- since fields of this type are by default not stored or indexed, any data added to 
+    	them will be ignored outright 
+    	--> 
+    	<fieldtype name="ignored" stored="false" indexed="false" class="solr.StrField"/>
+    </types>
+    <fields>
+			<field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/> 		
+    	
+    	<field name="categoryid" type="long" indexed="true" stored="true" required="true" multiValued="false"/>
+    	<field name="vendorid" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
+    	<field name="publish_hash" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="name" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="description" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="menucat" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="type" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="catalogid" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="period" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="position" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="image" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="thumbimage" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showshortdesc" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showimage" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showprice" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showtitle" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showcatname" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showcatdescription" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="rpp" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="rpr" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showparent" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showorder" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="mapleft" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="top" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="width" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="height" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showcatimage" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="upd" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="crpp" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="crpr" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="disptype" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="cdisptype" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="hidesearch" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="mcattype" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="menucat1" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="mcattype1" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="menucat2" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="mcattype2" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="menucat3" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="mcattype3" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="changed" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="autoview" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showlinktocat" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showspecialdesc" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="viewdetailimg" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="itemimg" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="text1" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="text2" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="text3" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="text4" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="text5" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="modifytime" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="creatorid" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="supplierid" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="upd1" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="upd2" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="upd3" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="metakeywords" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="metadescription" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="pagetitle" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="prodpromptdropdown" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="catpromptdropdown" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="prodtextdropdown" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="cattextdropdown" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="itemtempid" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="cattempid" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="publishpath" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="publishabspath" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="showassociate" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="dispsubcattype" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="publishstate" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="deadflag" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="startdate" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="enddate" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="keywords" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="available" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="seourl" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="urllocked" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+		<field name="longdesc" type="string" indexed="true" stored="true" required="false" multiValued="false"/>
+    	
+    	<dynamicField name="*_p" type="text" indexed="true" stored="true" multiValued="true"/>	
+    </fields>
+    <uniqueKey>categoryid</uniqueKey>
+    <defaultSearchField>longdesc</defaultSearchField>
+    <solrQueryParser defaultOperator="OR"/>
+</schema>

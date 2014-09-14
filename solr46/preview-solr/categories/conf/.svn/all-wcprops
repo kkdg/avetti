@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/software/!svn/ver/120413/avetticommerce/commerce8.5/trunk/src/site/resources/solr/categories-core/conf
+END
+schema.xml
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/software/!svn/ver/120413/avetticommerce/commerce8.5/trunk/src/site/resources/solr/categories-core/conf/schema.xml
+END
+solrconfig.xml
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/software/!svn/ver/120413/avetticommerce/commerce8.5/trunk/src/site/resources/solr/categories-core/conf/solrconfig.xml
+END

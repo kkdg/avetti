@@ -1,0 +1,4 @@
+*.pdf
+svn/repository
+svn/settings-original.xml
+httpd-2.2.26.tar.gz

@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!--  
+ This is the Solr schema file. This file should be named "schema.xml" and
+ should be in the conf directory under the solr home
+ (i.e. ./solr/conf/schema.xml by default) 
+ or located where the classloader for the Solr webapp can find it.
+
+ This example schema is the recommended starting point for users.
+ It should be kept correct and concise, usable out-of-the-box.
+
+ For more information, on how to customize this file, please see
+ http://wiki.apache.org/solr/SchemaXml
+-->
+
+<schema name="item" version="1.1">
+   <types>
+   	
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="integer" class="solr.IntField" omitNorms="true"/>
+    <fieldType name="long" class="solr.LongField" omitNorms="true"/>
+    <fieldType name="float" class="solr.FloatField" omitNorms="true"/>
+    <fieldType name="double" class="solr.DoubleField" omitNorms="true"/>
+
+    <fieldType name="sint" class="solr.SortableIntField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="slong" class="solr.SortableLongField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="sfloat" class="solr.SortableFloatField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="sdouble" class="solr.TrieDoubleField" sortMissingLast="true" omitNorms="true"/>
+
+    <fieldType name="date" class="solr.DateField" sortMissingLast="true" omitNorms="true"/>
+
+    <fieldType name="text_ws" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+      </analyzer>
+    </fieldType>
+
+    <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <!-- in this example, we will only use synonyms at query time
+        <filter class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>
+        -->
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldType>
+
+    <fieldType name="textTight" class="solr.TextField" positionIncrementGap="100" >
+      <analyzer>
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="0" generateNumberParts="0" catenateWords="1" catenateNumbers="1" catenateAll="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.PorterStemFilterFactory"/>
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldType>
+
+    <fieldType name="alphaOnlySort" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+      <analyzer>
+        <!-- KeywordTokenizer does no actual tokenizing, so the entire
+             input string is preserved as a single token
+          -->
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <!-- The LowerCase TokenFilter does what you expect, which can be
+             when you want your sorting to be case insensitive
+          -->
+        <filter class="solr.LowerCaseFilterFactory" />
+        <!-- The TrimFilter removes any leading or trailing whitespace -->
+        <filter class="solr.TrimFilterFactory" />
+        <!-- The PatternReplaceFilter gives you the flexibility to use
+             Java Regular expression to replace any sequence of characters
+             matching a pattern with an arbitrary replacement string, 
+             which may include back refrences to portions of the orriginal
+             string matched by the pattern.
+             
+             See the Java Regular Expression documentation for more
+             infomation on pattern and replacement string syntax.
+             
+             http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/package-summary.html
+          -->
+        <filter class="solr.PatternReplaceFilterFactory"
+                pattern="([^a-z])" replacement="" replace="all"
+        />
+      </analyzer>
+    </fieldType>
+
+    <!-- since fields of this type are by default not stored or indexed, any data added to 
+         them will be ignored outright 
+     --> 
+    <fieldtype name="ignored" stored="false" indexed="false" class="solr.StrField" /> 
+    
+    
+	<fieldType name="textSpell" class="solr.TextField" positionIncrementGap="100" stored="false" multiValued="true">
+		<analyzer type="index">
+			<tokenizer class="solr.StandardTokenizerFactory"/>
+			<filter class="solr.LowerCaseFilterFactory"/>
+			<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
+			<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
+			<filter class="solr.StandardFilterFactory"/>
+			<filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+		</analyzer>
+		<analyzer type="query">
+			<tokenizer class="solr.StandardTokenizerFactory"/>
+			<filter class="solr.LowerCaseFilterFactory"/>
+			<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
+			<filter class="solr.StandardFilterFactory"/>
+			<filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+		</analyzer>
+	</fieldType>    
+    
+    
+   </types>
+
+
+   <fields>
+		<field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>    	
+   	
+     <field name="itemid" type="slong" indexed="true" stored="true" required="true" multiValued="false"/>
+     <field name="mainitemid" type="slong" indexed="true" stored="true"/>
+     <field name="vendorid" type="string" indexed="true" stored="true" required="true"/>
+     <field name="linkname" type="text" indexed="true" stored="true"/>
+     <field name="checklink" type="text" indexed="true" stored="true"/>
+     <field name="code" type="string" indexed="true" stored="true"/>
+     <field name="title" type="text" indexed="true" stored="true"/>
+     <field name="title_copy" type="string" indexed="true" stored="true"/>
+     <field name="sorthint" type="string" indexed="true" stored="true"/>
+     <field name="weight" type="sdouble" indexed="true" stored="true"/>
+     <field name="length" type="sdouble" indexed="true" stored="true"/>
+     <field name="width" type="sdouble" indexed="true" stored="true"/>
+     <field name="height" type="sdouble" indexed="true" stored="true"/>
+     <field name="shortdesc" type="text" indexed="true" stored="true"/>
+     <field name="price" type="sdouble" indexed="true" stored="true"/>
+     <field name="image" type="text" indexed="true" stored="true"/>
+     <field name="picwidth" type="sint" indexed="true" stored="true"/>
+     <field name="picheight" type="sint" indexed="true" stored="true"/>
+     <field name="longdesc" type="text" indexed="true" stored="true"/>
+     <field name="filename" type="string" indexed="true" stored="true"/>
+     <field name="sign" type="string" indexed="true" stored="true"/>
+     <field name="showprice" type="string" indexed="true" stored="true"/>
+     <field name="cimage" type="string" indexed="true" stored="true"/>
+     <field name="version" type="sint" indexed="true" stored="true"/>
+     <field name="catalogid" type="slong" indexed="true" stored="true"/>
+     <field name="pricelength" type="sint" indexed="true" stored="true"/>
+     <field name="shiptype" type="string" indexed="true" stored="true"/>
+     <field name="shopbutt" type="sint" indexed="true" stored="true"/>
+     <field name="upd" type="sint" indexed="true" stored="true"/>
+     <field name="taxable" type="sint" indexed="true" stored="true"/>
+     <field name="weighttype" type="sint" indexed="true" stored="true"/>
+     <field name="lengthtype" type="sint" indexed="true" stored="true"/>
+     <field name="pricetype" type="sint" indexed="true" stored="true"/>
+     <field name="changed" type="sint" indexed="true" stored="true"/>
+     <field name="longdesc2" type="text" indexed="true" stored="true"/>
+     <field name="longdesc3" type="text" indexed="true" stored="true"/>
+     <field name="longdesc4" type="text" indexed="true" stored="true"/>
+     <field name="longdesc5" type="text" indexed="true" stored="true"/>
+     <field name="origcat" type="slong" indexed="true" stored="true"/>
+     <field name="linktocat" type="text" indexed="true" stored="true"/>
+     <field name="specialdesc" type="text" indexed="true" stored="true"/>
+     <field name="image3" type="string" indexed="true" stored="true"/>
+     <field name="image4" type="string" indexed="true" stored="true"/>
+     <field name="image5" type="string" indexed="true" stored="true"/>
+     <field name="image6" type="string" indexed="true" stored="true"/>
+     <field name="image7" type="string" indexed="true" stored="true"/>
+     <field name="image5l" type="string" indexed="true" stored="true"/>
+     <field name="image6l" type="string" indexed="true" stored="true"/>
+     <field name="image7l" type="string" indexed="true" stored="true"/>
+     <field name="preorderimg" type="string" indexed="true" stored="true"/>
+     <field name="modifytime" type="date" indexed="true" stored="true"/>
+     <field name="creatorid" type="string" indexed="true" stored="true"/>
+     <field name="comments" type="text" indexed="true" stored="true"/>
+     <field name="mfgname" type="text" indexed="true" stored="true"/>
+     <field name="mfgpartno" type="text" indexed="true" stored="true"/>
+     <field name="instock" type="sint" indexed="true" stored="true"/>
+     <field name="hide" type="sint" indexed="true" stored="true"/>
+     <field name="cost" type="sdouble" indexed="true" stored="true"/>
+     <field name="outofstockmsg" type="string" indexed="true" stored="true"/>
+     <field name="callmsg" type="string" indexed="true" stored="true"/>
+     <field name="oldshortdesc" type="text" indexed="true" stored="true"/>
+     <field name="published" type="sint" indexed="true" stored="true"/>
+     <field name="ap_callerid" type="slong" indexed="true" stored="true"/>
+     <field name="ap_calleeid" type="slong" indexed="true" stored="true"/>
+     <field name="buyimg" type="string" indexed="true" stored="true"/>
+     <field name="addimg" type="string" indexed="true" stored="true"/>
+     <field name="podate" type="date" indexed="true" stored="true"/>
+     <field name="prodstate" type="sint" indexed="true" stored="true"/>
+     <field name="preorder" type="string" indexed="true" stored="true"/>
+     <field name="pubstate" type="string" indexed="true" stored="true"/>
+     <field name="livepubstate" type="string" indexed="true" stored="true"/>
+     <field name="availtitle" type="text" indexed="true" stored="true"/>
+     <field name="availtext" type="text" indexed="true" stored="true"/>
+     <field name="availformat" type="sint" indexed="true" stored="true"/>
+     <field name="updatetime" type="slong" indexed="true" stored="true"/>
+     <field name="preorderbuttonimg" type="string" indexed="true" stored="true"/>
+     <field name="preorderbuttonimg4" type="string" indexed="true" stored="true"/>
+     <field name="upsell1" type="sint" indexed="true" stored="true"/>
+     <field name="upsell2" type="sint" indexed="true" stored="true"/>
+     <field name="upsellcode1" type="string" indexed="true" stored="true"/>
+     <field name="upsellcode2" type="string" indexed="true" stored="true"/>
+     <field name="addtocart" type="sint" indexed="true" stored="true"/>
+     <field name="additemcode" type="string" indexed="true" stored="true"/>
+     <field name="surcharge" type="sdouble" indexed="true" stored="true"/>
+     <field name="copyonpublish" type="sint" indexed="true" stored="true"/>
+     <field name="askshipwhen" type="sint" indexed="true" stored="true"/>
+     <field name="candropship" type="sint" indexed="true" stored="true"/>
+     <field name="storecode" type="sint" indexed="true" stored="true"/>
+     <field name="pubdate" type="date" indexed="true" stored="true"/>
+     <field name="availformat1" type="sint" indexed="true" stored="true"/>
+     <field name="availtext1" type="text" indexed="true" stored="true"/>
+     <field name="listprice" type="sdouble" indexed="true" stored="true"/>
+     <field name="startdate" type="date" indexed="true" stored="true"/>
+     <field name="enddate" type="date" indexed="true" stored="true"/>
+     <field name="available" type="boolean" indexed="true" stored="true"/>
+     <field name="keywords" type="text" indexed="true" stored="true"/>
+     <field name="rbmsg" type="string" indexed="true" stored="true"/>
+     <field name="itemsetupprice" type="sdouble" indexed="true" stored="true"/>
+     <field name="qty" type="sint" indexed="true" stored="true"/>
+     <field name="priceExist" type="boolean" indexed="true" stored="true"/>
+     <field name="compCode" type="string" indexed="true" stored="true"/>
+     <field name="metadescription" type="text" indexed="true" stored="true"/>
+     <field name="pagetitle" type="text" indexed="true" stored="true"/>
+     <field name="urllocked" type="boolean" indexed="true" stored="true"/>
+     <field name="seourl" type="string" indexed="true" stored="true"/>
+     <field name="lang" type="sint" indexed="true" stored="true"/>
+     <field name="approved" type="slong" indexed="true" stored="true"/>
+     <field name="user1" type="sint" indexed="true" stored="true"/>
+     <field name="user2" type="sint" indexed="true" stored="true"/>
+     <field name="cid" type="slong" indexed="true" multiValued="true" stored="true"/>
+     <field name="cname" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="itemimage" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="itemimage2" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="itemimage3" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="itemimage4" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="itemimage5" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="largeimage" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="largeimage2" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="largeimage3" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="largeimage4" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="largeimage5" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="smallimage" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="smallimage2" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="smallimage3" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="smallimage4" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="smallimage5" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="thumbnail" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="thumbnail2" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="thumbnail3" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="thumbnail4" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="thumbnail5" type="string" indexed="true" multiValued="true" stored="true"/>
+     
+     <field name="inv_instock" type="sint" indexed="true" stored="true"/>
+     
+     <!-- Item location (itemfilter) fields -->
+     <field name="countrycode_il" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="regioncode_il" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="city_il" type="string" indexed="true" multiValued="true" stored="true"/>
+     <field name="sgid_il" type="slong" indexed="true" multiValued="true" stored="true"/>
+     <field name="scid_il" type="slong" indexed="true" multiValued="true" stored="true"/>
+     <field name="user1_il" type="slong" indexed="true" multiValued="true" stored="true"/>
+     <field name="user2_il" type="slong" indexed="true" multiValued="true" stored="true"/>
+     
+     
+			<field name="a_spell" type="textSpell" />     
+     
+     <!-- dynamic field, which stores an item properties -->
+     <dynamicField name="*_p" type="string" indexed="true" stored="true" multiValued="true"/>
+     <dynamicField name="*_d" type="sdouble" indexed="true" stored="true"/>
+     <dynamicField name="*_ml" type="text" indexed="true" stored="true" multiValued="true" />
+     <dynamicField name="*_sort_ml" type="string" indexed="true" stored="false"/>
+     <dynamicField name="*_mlf" type="string" indexed="true" stored="true" multiValued="true"/>
+     <dynamicField name="*_l" type="slong" indexed="true" stored="true"/>
+     
+     <dynamicField name="*_opt" type="string" indexed="true" stored="true" multiValued="true"/>
+     
+     <dynamicField name="*_facet_field" type="string" indexed="true" stored="true" multiValued="true"/>
+     <dynamicField name="*_search_field" type="text" indexed="true" stored="true" multiValued="true" />
+   </fields>
+   
+   <uniqueKey>itemid</uniqueKey>
+   <defaultSearchField>longdesc</defaultSearchField>
+   <solrQueryParser defaultOperator="OR"/>
+   
+   <copyField source="title" dest="title_copy"/>
+   <copyField source="title" dest="title_facet_field"/>
+   <copyField source="shortdesc" dest="shortdesc_facet_field"/>
+   
+   <copyField source="code" dest="code_search_field"/>
+   <copyField source="vendorid" dest="vendorid_search_field"/>
+
+   
+   <copyField source="*_ml" dest="*_mlf"/>
+   
+	 <copyField source="Sys_Merchandising_Priority_p" dest="Sys_Merchandising_Priority_l"/> 
+
+
+		<copyField source="code" dest="a_spell"/>
+		<copyField source="title" dest="a_spell"/>
+		<copyField source="shortdesc" dest="a_spell"/>
+		<copyField source="vendorid" dest="a_spell"/>
+	
+
+</schema>
+
